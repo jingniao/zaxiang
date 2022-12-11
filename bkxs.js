@@ -11,7 +11,6 @@ withdraws='' 1为1元 2为5元 3为10元 4为30元 5为50元 6为100元
 建议一天别跑多了 怕黑 
 cron 0 1,10 * * * bkxs.js
 */
-
 const $ = new Env('必看小说');
 var crypto = require("crypto");
 let status;

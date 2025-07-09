@@ -1,5 +1,5 @@
 #!/bin/bash
-
+ 
 # 检查并安装bc
 if ! command -v bc &>/dev/null; then
     echo "检测到未安装bc，正在自动安装..."

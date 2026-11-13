@@ -24,9 +24,28 @@ echo
 read -rp "请输入 SSH 端口 [默认 22222]: " SSH_PORT
 SSH_PORT=${SSH_PORT:-22222}
 
-read -rp "请输入时区 [默认 Asia/Shanghai]: " TIMEZONE
-TIMEZONE=${TIMEZONE:-Asia/Shanghai}
+TIMEZONE=$(timedatectl show --property=Timezone --value)
 
+echo
+echo "请选择时区："
+echo "  1. 保留当前时区：$TIMEZONE（默认）"
+echo "  2. 上海时区：Asia/Shanghai"
+read -rp "请输入选项 [默认 1]: " TIMEZONE_CHOICE
+TIMEZONE_CHOICE=${TIMEZONE_CHOICE:-1}
+
+case "$TIMEZONE_CHOICE" in
+    1)
+        ;;
+    2)
+        TIMEZONE="Asia/Shanghai"
+        ;;
+    *)
+        echo "时区选项只能是 1 或 2" >&2
+        exit 1
+        ;;
+esac
+
+echo
 read -rp "请输入额外开放端口，空格分隔 [默认 80 443]: " FIREWALL_PORTS
 FIREWALL_PORTS=${FIREWALL_PORTS:-"80 443"}
 
@@ -63,12 +82,18 @@ apt update && apt upgrade -y
 echo
 echo "2. 安装基础工具、UFW、fail2ban..."
 apt install -y \
-curl wget vim nano git htop iotop iftop screen tmux unzip zip sudo cron \
-dnsutils net-tools ca-certificates ufw fail2ban
+    curl wget vim nano git htop iotop iftop screen tmux unzip zip sudo cron \
+    dnsutils net-tools ca-certificates ufw fail2ban
 
 echo
 echo "3. 设置时区..."
-timedatectl set-timezone "$TIMEZONE"
+
+if [ "$TIMEZONE_CHOICE" = "2" ]; then
+    timedatectl set-timezone "$TIMEZONE"
+    echo "已设置时区：$TIMEZONE"
+else
+    echo "保留当前时区：$TIMEZONE"
+fi
 
 echo
 echo "4. 配置 SSH..."
